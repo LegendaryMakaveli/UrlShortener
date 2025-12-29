@@ -12,7 +12,7 @@ public class User {
     private String id;
     private String email;
     private String password;
-    private Role role = Role.USER;
-    private Subscription subscription = Subscription.FREE;
+    private Role role;
+    private Subscription subscription;
     private int urlCount;
 }

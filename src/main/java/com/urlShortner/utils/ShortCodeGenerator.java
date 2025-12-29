@@ -21,6 +21,6 @@ public class ShortCodeGenerator {
             code.append(CHARACTERS.charAt(
                     random.nextInt(CHARACTERS.length())));
         }
-        return "maka" + code.toString();
+        return "maka" + code;
     }
 }
