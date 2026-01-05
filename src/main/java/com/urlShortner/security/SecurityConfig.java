@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,8 +21,8 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     private final JwtAuthFilter jwtAuthFilter;
+
     @Value("${cors.allowed.origins}")
     private String allowedOrigins;
 
@@ -30,39 +31,55 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("=== SecurityFilterChain Configuration Starting ===");
 
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/url/**").permitAll()
-                        .requestMatchers("/r/{shortCode}").permitAll()
-                        .requestMatchers("/health").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    System.out.println("Configuring authorization rules...");
+                    auth
+                            .requestMatchers("/health").permitAll()
+                            .requestMatchers("/auth/**").permitAll()
+                            .requestMatchers("/url/**").permitAll()
+                            .requestMatchers("/r/{shortCode}").permitAll()
+                            .anyRequest().authenticated();
+                })
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
+        System.out.println("=== SecurityFilterChain Configuration Complete ===");
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("=== Configuring CORS ===");
+        System.out.println("Allowed Origins from properties: " + allowedOrigins);
+
         CorsConfiguration config = new CorsConfiguration();
-        List<String> origins = Arrays.asList(allowedOrigins.split(","));
-        config.setAllowedOrigins(origins);
+
+        // Parse origins and trim whitespace
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .toList();
+
+        System.out.println("Parsed origins: " + origins);
+
+        // Use allowedOriginPatterns for more flexibility with credentials
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
         config.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        config.setMaxAge(3600L); //cache preflight for 1hr
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
+        System.out.println("=== CORS Configuration Complete ===");
         return source;
     }
 
