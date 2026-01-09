@@ -40,7 +40,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     System.out.println("Configuring authorization rules...");
                     auth
-                            .requestMatchers("/health").permitAll()
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/url/**").permitAll()
                             .requestMatchers("/r/**").permitAll()
