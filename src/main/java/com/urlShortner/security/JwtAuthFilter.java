@@ -39,7 +39,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
             String token = authHeader.substring(7);
             String email = jwtService.extractEmail(token);
 
@@ -50,9 +49,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
-        }
 
         filterChain.doFilter(request, response);
     }
