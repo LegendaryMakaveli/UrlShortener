@@ -32,8 +32,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("=== SecurityFilterChain Configuration Starting ===");
-
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -49,27 +47,17 @@ public class SecurityConfig {
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        System.out.println("=== SecurityFilterChain Configuration Complete ===");
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("=== Configuring CORS ===");
-        System.out.println("Allowed Origins from properties: " + allowedOrigins);
-
         CorsConfiguration config = new CorsConfiguration();
 
-        // Parse origins and trim whitespace
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .toList();
-
-        System.out.println("Parsed origins: " + origins);
-
-        // Use allowedOriginPatterns for more flexibility with credentials
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
+        config.setAllowedOrigins(origins);
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
@@ -79,7 +67,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        System.out.println("=== CORS Configuration Complete ===");
         return source;
     }
 

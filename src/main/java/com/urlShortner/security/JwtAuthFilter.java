@@ -29,7 +29,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        System.out.println("JwtAuthFilter - Path: " + path + " | Method: " + request.getMethod());
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             System.out.println("OPTIONS request - passing through");
@@ -52,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtService.isTokenValid(token, email)) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                System.out.println("Token validated for: " + email);
+
             }
         }
 
