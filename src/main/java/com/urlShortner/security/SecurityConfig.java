@@ -43,7 +43,7 @@ public class SecurityConfig {
                             .requestMatchers("/health").permitAll()
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/url/**").permitAll()
-                            .requestMatchers("/r/{shortCode}").permitAll()
+                            .requestMatchers("/r/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
