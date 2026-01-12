@@ -59,12 +59,21 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, String email) {
-        final String tokenEmail = extractEmail(token);
-        return (tokenEmail.equals(email)) && !isTokenExpired(token);
+        try {
+            final String extractedEmail = extractEmail(token);
+            return (extractedEmail.equals(email) && !isTokenExpired(token));
+        } catch (Exception e) {
+            System.err.println("Token validation error: " + e.getMessage());
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     private Date extractExpiration(String token) {

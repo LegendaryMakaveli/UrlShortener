@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,13 +18,11 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -39,6 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        try {
             String token = authHeader.substring(7);
             String email = jwtService.extractEmail(token);
 
@@ -49,7 +49,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
-
+        }catch(Exception e){
+            System.out.println("Auth fail: " + e.getMessage());
+            SecurityContextHolder.clearContext();
+        }
         filterChain.doFilter(request, response);
     }
 

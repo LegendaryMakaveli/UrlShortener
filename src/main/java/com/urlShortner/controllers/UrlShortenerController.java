@@ -19,7 +19,7 @@ public class UrlShortenerController {
     @Autowired
     private UrlService urlService;
 
-    @PostMapping(value = "/shortenUrl", consumes = "application/json")
+    @PostMapping("/shortenUrl")
     public ResponseEntity<?> shortenUrl(@RequestBody ShortUrlRequest request) {
         try {
             return new ResponseEntity<>(new ApiResponse(true, urlService.shortenUrl(request)),HttpStatus.OK);
