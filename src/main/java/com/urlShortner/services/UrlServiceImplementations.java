@@ -35,7 +35,7 @@ public class UrlServiceImplementations implements UrlService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if (user.getSubscription() == Subscription.FREE) {
             long count = shortUrlRepository.countByOwner(user);
-            if (count >= 2) throw new UrlLimitExceededException("Upgrade to premium to shorten more URLs");
+            if (count >= 2  ) throw new UrlLimitExceededException("Upgrade to premium to shorten more URLs");
         }
 
         String shortCode;

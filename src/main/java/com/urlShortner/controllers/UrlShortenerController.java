@@ -4,6 +4,7 @@ package com.urlShortner.controllers;
 import com.urlShortner.dtos.requests.ShortUrlRequest;
 import com.urlShortner.dtos.responses.ApiResponse;
 import com.urlShortner.exceptions.ShortUrlException;
+import com.urlShortner.exceptions.UrlLimitExceededException;
 import com.urlShortner.services.UrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,9 @@ public class UrlShortenerController {
         try {
             return new ResponseEntity<>(new ApiResponse(true, urlService.shortenUrl(request)),HttpStatus.OK);
 
-        } catch (ShortUrlException error) {
+        } catch (UrlLimitExceededException error){
+            return new ResponseEntity<>(new ApiResponse(false,error.getMessage()),HttpStatus.BAD_REQUEST);
+        }catch (ShortUrlException error) {
             return new ResponseEntity<>(new ApiResponse(false, error.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
