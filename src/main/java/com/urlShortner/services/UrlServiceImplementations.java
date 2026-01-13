@@ -33,11 +33,6 @@ public class UrlServiceImplementations implements UrlService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        if (user.getSubscription() == Subscription.FREE) {
-            long count = shortUrlRepository.countByOwner(user);
-            if (count >= 2  ) throw new UrlLimitExceededException("Upgrade to premium to shorten more URLs");
-        }
-
         String shortCode;
         do {
             shortCode = shortCodeGenerator.generate();
@@ -46,9 +41,11 @@ public class UrlServiceImplementations implements UrlService {
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setLongUrl(request.getLongUrl());
         shortUrl.setShortUrl(shortCode);
-        shortUrl.setOwner(user);
-
+        shortUrl.setOwner(user.getEmail());
+        user.setUrlCount(user.getUrlCount() + 1);
+        if(user.getUrlCount() >= 2) throw new UrlLimitExceededException("Upgrade to premium to shorten more URLs");
         shortUrlRepository.save(shortUrl);
+        userRepository.save(user);
 
         return new ShortUrlResponse(shortCode);
     }

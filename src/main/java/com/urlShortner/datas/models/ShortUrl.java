@@ -13,5 +13,5 @@ public class ShortUrl {
     private String shortUrl;
     private String longUrl;
     private String createdAt;
-    private User owner;
+    private String owner;
 }
