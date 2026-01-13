@@ -14,6 +14,4 @@ public class ShortUrl {
     private String longUrl;
     private String createdAt;
     private User owner;
-    private Long clickCount;
-    private boolean customUrl;
 }
