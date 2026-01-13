@@ -3,7 +3,9 @@ package com.urlShortner.controllers;
 import com.urlShortner.dtos.requests.LoginUserRequest;
 import com.urlShortner.dtos.requests.RegisterUserRequesst;
 import com.urlShortner.dtos.responses.ApiResponse;
+import com.urlShortner.exceptions.InvalidCredentialsException;
 import com.urlShortner.exceptions.ShortUrlException;
+import com.urlShortner.exceptions.UserAlreadyExistEception;
 import com.urlShortner.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,10 @@ public class AuthController {
     public ResponseEntity<?> signUp(@RequestBody RegisterUserRequesst request){
         try{
             return new ResponseEntity<>(new ApiResponse(true,authService.registerUser(request)), HttpStatus.CREATED);
-        } catch (ShortUrlException error){
+        }catch (UserAlreadyExistEception error){
             return new ResponseEntity<>(new ApiResponse(false,error.getMessage()),HttpStatus.BAD_REQUEST);
+        } catch (ShortUrlException error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -33,8 +37,10 @@ public class AuthController {
     public  ResponseEntity<?> login(@RequestBody LoginUserRequest request){
         try{
             return new ResponseEntity<>(new ApiResponse(true, authService.loginUser(request)), HttpStatus.OK);
-        } catch (ShortUrlException error){
+        }catch (InvalidCredentialsException error){
             return new ResponseEntity<>(new ApiResponse(false,error.getMessage()),HttpStatus.BAD_REQUEST);
+        }catch (ShortUrlException error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }
